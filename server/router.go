@@ -11,8 +11,11 @@ func NewRouter() *gin.Engine {
 	router.Use(gin.Recovery())
 
 	health := new(controllers.HealthController)
+	currency := new(controllers.CurrencyController)
 
-	router.GET("/health", health.Status)
+	router.GET("/ping", health.Ping)
+	router.GET("/alive", health.Alive)
+	router.GET("/currency", currency.GetCurrency)
 
 	return router
 

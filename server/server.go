@@ -9,6 +9,7 @@ func Init() {
 	conf := config.GetConfig()
 	r := NewRouter()
 	addr := fmt.Sprintf("%s:%s", conf.GetString("server.host"), conf.GetString("server.port"))
+	//TODO: implement scheduled task
 	err := r.Run(addr)
 	if err != nil {
 		panic(err)

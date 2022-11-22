@@ -19,7 +19,9 @@ func Init() {
 		c.GetString("database.password"),
 		c.GetString("database.dbName"))
 
-	db, err := sql.Open("postgres", psqlconn)
+	var err error
+
+	db, err = sql.Open("postgres", psqlconn)
 
 	if err != nil {
 		panic(err)
@@ -28,8 +30,13 @@ func Init() {
 	if err = db.Ping(); err != nil {
 		panic(err)
 	}
+
 }
 
 func GetDB() *sql.DB {
 	return db
+}
+
+func createTable() error {
+	return nil
 }
