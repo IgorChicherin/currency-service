@@ -17,6 +17,12 @@ services:
     ports:
       - 8080:8080
 
-
-  currency:
-    image:
+  currency-service:
+    build:
+      dockerfile: Dockerfile
+    restart: always
+    command:
+      - "-e"
+      - "develop"
+    ports:
+      - 8005:8005

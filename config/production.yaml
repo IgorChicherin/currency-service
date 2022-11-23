@@ -1,0 +1,32 @@
+database:
+  host: "localhost"
+  port: 5432
+  username: "postgres"
+  password: "user"
+  dbName: "production"
+
+server:
+  host: "0.0.0.0"
+  port: 8005
+
+service:
+  component: "currency-service"
+  version: "0.1"
+
+currencies:
+  tsyms:
+    - USD
+    - EUR
+    - GBP
+    - JPY
+    - RUR
+
+  fsyms:
+    - BTC
+    - XRP
+    - ETH
+    - BCH
+    - EOS
+    - LTC
+    - XMR
+    - DASH
