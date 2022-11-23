@@ -11,13 +11,13 @@ type CurrencyResponse struct {
 	Display map[string]map[string]CurrencyInfoDisplay `json:"DISPLAY"`
 }
 
-func (receiver *CurrencyResponse) Save() error {
-	for fsym, tsyms := range receiver.Raw {
+func (cc *CurrencyResponse) Save() error {
+	for fsym, tsyms := range cc.Raw {
 		for tsym, currencyInfoRaw := range tsyms {
 			var currencyPair CurrencyPairInfo
 			currencyPair.Symbol = strings.Join([]string{fsym, tsym}, ":")
 			currencyPair.Raw = currencyInfoRaw
-			currencyPair.Display = receiver.Display[fsym][tsym]
+			currencyPair.Display = cc.Display[fsym][tsym]
 
 			err := currencyPair.Save()
 
@@ -66,17 +66,17 @@ type CurrencyPairInfo struct {
 	Display CurrencyInfoDisplay `json:"display"`
 }
 
-func (receiver *CurrencyPairInfo) Save() error {
+func (cc *CurrencyPairInfo) Save() error {
 	database := db.GetDB()
-	data, err := json.Marshal(&receiver)
+	data, err := json.Marshal(&cc)
 
 	query := "INSERT INTO ticks (symbol, data) VALUES ($1, $2);"
-	_, err = database.Exec(query, &receiver.Symbol, &data)
+	_, err = database.Exec(query, &cc.Symbol, &data)
 
 	return err
 }
 
-func (receiver *CurrencyPairInfo) Load(symbol string) error {
+func (cc *CurrencyPairInfo) Load(symbol string) error {
 	database := db.GetDB()
 	var data []byte
 	row := database.QueryRow(
@@ -84,6 +84,6 @@ func (receiver *CurrencyPairInfo) Load(symbol string) error {
 		symbol)
 	err := row.Scan(&data)
 
-	err = json.Unmarshal(data, &receiver)
+	err = json.Unmarshal(data, &cc)
 	return err
 }

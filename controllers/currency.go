@@ -18,15 +18,15 @@ type CurrencyController struct {
 	Upgrader websocket.Upgrader
 }
 
-func (receiver *CurrencyController) Home(c *gin.Context) {
+func (cc *CurrencyController) Home(c *gin.Context) {
 	conf := config.GetConfig()
 	ws := fmt.Sprintf("ws://%s:%s/ws", conf.GetString("server.host"), conf.GetString("server.port"))
 	c.HTML(http.StatusOK, "home.html", gin.H{"host": ws})
 }
 
-func (receiver *CurrencyController) GetCurrencyWs(c *gin.Context) {
-	receiver.Upgrader.CheckOrigin = func(r *http.Request) bool { return true }
-	conn, err := receiver.Upgrader.Upgrade(c.Writer, c.Request, nil)
+func (cc *CurrencyController) GetCurrencyWs(c *gin.Context) {
+	cc.Upgrader.CheckOrigin = func(r *http.Request) bool { return true }
+	conn, err := cc.Upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		log.Print("upgrade:", err)
 		return
@@ -47,7 +47,7 @@ func (receiver *CurrencyController) GetCurrencyWs(c *gin.Context) {
 			break
 		}
 
-		errors, currencyResponse, respErr := receiver.getCurrency(currency.Fsyms, &currency.Tsyms)
+		errors, currencyResponse, respErr := cc.getCurrency(currency.Fsyms, &currency.Tsyms)
 
 		if len(errors) == 0 && respErr == nil {
 			err = conn.WriteJSON(&currencyResponse)
@@ -68,7 +68,7 @@ func (receiver *CurrencyController) GetCurrencyWs(c *gin.Context) {
 	}
 }
 
-func (receiver *CurrencyController) GetCurrency(c *gin.Context) {
+func (cc *CurrencyController) GetCurrency(c *gin.Context) {
 	var request forms.CurrencyRequest
 
 	if c.ShouldBind(&request) != nil {
@@ -78,7 +78,7 @@ func (receiver *CurrencyController) GetCurrency(c *gin.Context) {
 
 	tsyms := strings.Split(request.Tsyms, ",")
 
-	errors, currencyResponse, err := receiver.getCurrency(request.Fsyms, &tsyms)
+	errors, currencyResponse, err := cc.getCurrency(request.Fsyms, &tsyms)
 
 	if len(errors) != 0 {
 		c.IndentedJSON(http.StatusBadRequest, errors)
@@ -93,7 +93,7 @@ func (receiver *CurrencyController) GetCurrency(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, currencyResponse)
 }
 
-func (receiver *CurrencyController) getCurrency(fsyms string, tsyms *[]string) ([]map[string]string, models.CurrencyResponse, error) {
+func (cc *CurrencyController) getCurrency(fsyms string, tsyms *[]string) ([]map[string]string, models.CurrencyResponse, error) {
 	var errors []map[string]string
 	conf := config.GetConfig()
 	tsymsConf := conf.GetStringSlice("currencies.tsyms")
@@ -113,9 +113,9 @@ func (receiver *CurrencyController) getCurrency(fsyms string, tsyms *[]string) (
 		return errors, models.CurrencyResponse{}, nil
 	}
 
-	data, err := receiver.getCurrencyFromHttp(fsyms, tsyms)
+	data, err := cc.getCurrencyFromHttp(fsyms, tsyms)
 	if err != nil {
-		dbData, err := receiver.getCurrencyFromDb(fsyms, tsyms)
+		dbData, err := cc.getCurrencyFromDb(fsyms, tsyms)
 		if err != nil {
 			return errors, models.CurrencyResponse{}, err
 		}
@@ -124,7 +124,7 @@ func (receiver *CurrencyController) getCurrency(fsyms string, tsyms *[]string) (
 	return errors, data, nil
 }
 
-func (receiver *CurrencyController) getCurrencyFromDb(fsym string, tsyms *[]string) (models.CurrencyResponse, error) {
+func (cc *CurrencyController) getCurrencyFromDb(fsym string, tsyms *[]string) (models.CurrencyResponse, error) {
 	var data models.CurrencyResponse
 	raw := make(map[string]map[string]models.CurrencyInfoRaw)
 	display := make(map[string]map[string]models.CurrencyInfoDisplay)
@@ -153,7 +153,7 @@ func (receiver *CurrencyController) getCurrencyFromDb(fsym string, tsyms *[]stri
 	return data, nil
 }
 
-func (receiver *CurrencyController) getCurrencyFromHttp(fsym string, tsyms *[]string) (models.CurrencyResponse, error) {
+func (cc *CurrencyController) getCurrencyFromHttp(fsym string, tsyms *[]string) (models.CurrencyResponse, error) {
 	return GetCurrencyFromHttp(fsym, tsyms)
 }
 
