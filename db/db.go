@@ -31,12 +31,27 @@ func Init() {
 		panic(err)
 	}
 
+	err = createTicksTable()
+
+	if err != nil {
+		fmt.Println(fmt.Errorf("Creating table `%s` error: %s", "ticks", err.Error()))
+	}
+
 }
 
 func GetDB() *sql.DB {
 	return db
 }
 
-func createTable() error {
-	return nil
+func createTicksTable() error {
+	query := `
+		CREATE TABLE IF NOT EXISTS ticks (
+		    id      SERIAL PRIMARY KEY,
+		    symbol  VARCHAR(25) NOT NULL,
+		    data    JSON NOT NULL,
+		    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	);
+`
+	_, err := db.Exec(query)
+	return err
 }
