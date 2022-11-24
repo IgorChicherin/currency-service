@@ -29,13 +29,13 @@ func fetchSymbols() {
 		response, err := controllers.GetCurrencyFromHttp(fsym, &tsymsConf)
 
 		if err != nil {
-			log.Fatal("fetchSymbols fetch task error")
+			log.Println("fetchSymbols fetch task error")
 		}
 
 		err = response.Save()
 
 		if err != nil {
-			log.Fatal("fetchSymbols save task error")
+			log.Println("fetchSymbols save task error")
 		}
 	}
 }
